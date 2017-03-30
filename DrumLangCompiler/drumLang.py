@@ -71,7 +71,7 @@ for pattern in fin.readlines():
 
     
     outputLengths.append(length)
-    outputs.append('\t' + output + '\n')
+    outputs.append('\t' + output)
 
 fout.writelines('const int numOfPatterns = ' + str(len(outputs)) + ';\n')
 fout.writelines('const int maxLength = ' + str(max(outputLengths)) + ';\n\n')
@@ -82,5 +82,5 @@ lenArr = '{' + lenArr + '}'
 fout.writelines('const int lengths[numOfPatterns] = ' + lenArr + ';\n')
 
 fout.writelines('const int patterns[numOfPatterns][maxLength] = {\n')
-fout.writelines(', '.join(outputs))
-fout.writelines('};\n')
+fout.writelines(',\n'.join(outputs))
+fout.writelines('\n};\n')
