@@ -1,4 +1,4 @@
-inputFile = r"input.txt"
+inputFile = r"patterns/input.txt"
 outputFile = r"../ArduinoHit/patterns.h"
 
 stickHit = {1:65, 2:65}
