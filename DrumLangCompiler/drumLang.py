@@ -57,7 +57,9 @@ for i, beat in enumerate(beats):
         switchStick()
 
 
+length = len(output)
 output = list(map(lambda x: str(x),output))
 output = ', '.join(output)
 output = '{' + output + '}'
 fout.writelines(output)
+fout.writelines('\nLength: ' + str(length))

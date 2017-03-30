@@ -1,4 +1,5 @@
 #include "avr/wdt.h"
+#include "patterns.cpp"
 
 #define IN1 6
 #define IN2 7
@@ -7,7 +8,6 @@
 #define IN4 9
 
 void setup() {
-
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT);
@@ -22,7 +22,7 @@ void setup() {
   Serial.begin(9600);
 }
 
-void go(int* pattern, int len) {
+void go(const int* pattern, const int len) {
   
   for (int i=0; i<len; i+=3) {
     int stick = pattern[i];
@@ -32,20 +32,15 @@ void go(int* pattern, int len) {
   }
 }
 
-void loop() {
-
-  int stick1attack[] = {1, 0, 100, 1, 1, 500};
-  int stick2attack[] = {2, 0, 100, 2, 1, 0};
-  int len = 6;
-  
+void loop() { 
   // check for incoming serial data:
   if (Serial.available() > 0) {
     // read incoming serial data:
     char inChar = Serial.read();
   
     if (inChar == '\n'){
-        go(stick1attack, len); 
-        go(stick2attack, len);
+        go(pattern1, len1); 
+        
     }
   }
 }
