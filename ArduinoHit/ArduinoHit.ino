@@ -1,5 +1,5 @@
 #include "avr/wdt.h"
-#include "patterns.cpp"
+#include "patterns.h"
 
 #define IN1 6
 #define IN2 7
@@ -22,6 +22,19 @@ void setup() {
   Serial.begin(9600);
 }
 
+void loop() { 
+  // check for incoming serial data:
+  if (Serial.available() > 0) {
+    // read incoming serial data:
+    char inChar = Serial.read();
+   
+    if (inChar == '\n'){
+        go(patterns[0], lengths[0]); 
+        
+    }
+  }
+}
+
 void go(const int* pattern, const int len) {
   
   for (int i=0; i<len; i+=3) {
@@ -29,19 +42,6 @@ void go(const int* pattern, const int len) {
     int dir = pattern[i+1];
     hit(stick, dir);
     delay(pattern[i+2]);
-  }
-}
-
-void loop() { 
-  // check for incoming serial data:
-  if (Serial.available() > 0) {
-    // read incoming serial data:
-    char inChar = Serial.read();
-  
-    if (inChar == '\n'){
-        go(pattern1, len1); 
-        
-    }
   }
 }
 
