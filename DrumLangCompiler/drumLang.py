@@ -79,8 +79,8 @@ fout.writelines('const int maxLength = ' + str(max(outputLengths)) + ';\n\n')
 lenArr = list(map(lambda x: str(x),outputLengths))
 lenArr = ', '.join(lenArr)
 lenArr = '{' + lenArr + '}'
-fout.writelines('const int lengths[numOfPatterns] = ' + lenArr + ';\n')
+fout.writelines('const int lengths[numOfPatterns] PROGMEM = ' + lenArr + ';\n')
 
-fout.writelines('const int patterns[numOfPatterns][maxLength] = {\n')
+fout.writelines('const int patterns[numOfPatterns][maxLength] PROGMEM = {\n')
 fout.writelines(',\n'.join(outputs))
 fout.writelines('\n};\n')

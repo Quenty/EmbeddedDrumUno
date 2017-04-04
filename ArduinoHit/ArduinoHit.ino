@@ -1,4 +1,5 @@
 #include "avr/wdt.h"
+#include <avr/pgmspace.h>
 #include "patterns.h"
 
 #define IN1 6
@@ -6,6 +7,7 @@
 
 #define IN3 8
 #define IN4 9
+
 
 void setup() {
   pinMode(IN1, OUTPUT);
@@ -28,9 +30,9 @@ void loop() {
     // read incoming serial data:
     char inChar = Serial.read();
    
-    if (inChar == '\n'){
-        go(patterns[0], lengths[0]); 
-        
+    if (inChar >= '1' && inChar <= '4'){
+        int inNum = inChar - '1';  //convert char to int (minus 1 for 0 array index)
+        go(patterns[inNum], lengths[inNum]);         
     }
   }
 }
