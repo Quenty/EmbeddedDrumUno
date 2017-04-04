@@ -25,21 +25,18 @@ void setup() {
 }
 
 void loop() { 
-  Serial.write("GO");
-  go(patterns[0], lengths[0]);
-  
+  //Serial.write("GO\n");
   // check for incoming serial data:
-  /*if (Serial.available() > 0) {
+  if (Serial.available() > 0) {
     // read incoming serial data:
     char inChar = Serial.read();
     int inNum = (int)(inChar) - 49;
 
     if (inNum >= 0 && inNum < 4){
         //convert char to int (minus 1 for 0 array index)
-        inNum = 0;
         go(patterns[inNum], lengths[inNum]);
     }
-  }*/
+  }
 } 
 
 void go(const int* pattern, const int len) {
@@ -49,25 +46,31 @@ void go(const int* pattern, const int len) {
   }
   
   for (int i=0; i<len; i+=3) {
-    int stick = pattern[i];
-    int dir = pattern[i+1];
+    int stick = pgm_read_word_near(pattern + i);
+    int dir = pgm_read_word_near(pattern + (i + 1)); 
+    int pause = pgm_read_word_near(pattern + (i + 2)); 
+
+    //char buffer[100];
+    //sprintf(buffer, "stick %d direction %d pause %d \n", stick, dir, pause);
+    //Serial.write(buffer);
+    
     Serial.write("call hit");
     hit(stick, dir); 
-    delay(pattern[i+2]);
+    delay(pause); 
   } 
 } 
 
 void hit(int stick, int dir) { 
-  char buffer[100];
-  sprintf(buffer, "stick %d direction %d\n", stick, dir);
-  Serial.write(buffer);
+  //char buffer[100];
+  //sprintf(buffer, "stick %d direction %d\n", stick, dir);
+  //Serial.write(buffer);
   if (stick==1) {
-    Serial.write("stick1 moving\n");
+    //Serial.write("stick1 moving\n");
     
     digitalWrite(IN1, dir);   
     digitalWrite(IN2, !dir);
   } else if (stick==2) {
-    Serial.write("stick2 moving\n"); 
+    //Serial.write("stick2 moving\n"); 
     
     digitalWrite(IN3, dir);
     digitalWrite(IN4, !dir);
