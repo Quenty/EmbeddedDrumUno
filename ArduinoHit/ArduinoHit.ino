@@ -1,6 +1,4 @@
-#include "avr/wdt.h"
-#include <avr/pgmspace.h>
-#include "patterns.h"
+#include "stream.h"
 
 #define IN1 6
 #define IN2 7
