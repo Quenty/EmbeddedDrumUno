@@ -1,3 +1,7 @@
+// CSCE 236
+// Authors: Angelo Tenerelli, Dylan Gray, Ibraim Salinas, James Onnen, Lee Fitchett
+// April 4th, 2017
+
 #include "avr/wdt.h"
 #include <avr/pgmspace.h>
 #include "patterns.h"
@@ -7,7 +11,6 @@
 
 #define IN3 8
 #define IN4 9
-
 
 void setup() {
   pinMode(IN1, OUTPUT);
@@ -20,20 +23,15 @@ void setup() {
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
   
-  // open the serial port:
   Serial.begin(9600);
 }
 
 void loop() { 
-  //Serial.write("GO\n");
-  // check for incoming serial data:
   if (Serial.available() > 0) {
-    // read incoming serial data:
     char inChar = Serial.read();
-    int inNum = (int)(inChar) - 49;
+    int inNum = (int)(inChar) - 49;  // convert char to int (minus 1 for 0 array index)
 
     if (inNum >= 0 && inNum < 4){
-        //convert char to int (minus 1 for 0 array index)
         go(patterns[inNum], lengths[inNum]);
     }
   }
@@ -42,7 +40,7 @@ void loop() {
 void go(const int* pattern, const int len) {
   if (len <= 0)
   {
-    Serial.write("Bad length");
+    Serial.write("Bad length\n");
   }
   
   for (int i=0; i<len; i+=3) {
@@ -50,11 +48,10 @@ void go(const int* pattern, const int len) {
     int dir = pgm_read_word_near(pattern + (i + 1)); 
     int pause = pgm_read_word_near(pattern + (i + 2)); 
 
-    //char buffer[100];
-    //sprintf(buffer, "stick %d direction %d pause %d \n", stick, dir, pause);
-    //Serial.write(buffer);
+    // char buffer[100];
+    // sprintf(buffer, "stick %d direction %d pause %d \n", stick, dir, pause);
+    // Serial.write(buffer);
     
-    Serial.write("call hit");
     hit(stick, dir); 
     delay(pause); 
   } 
@@ -65,18 +62,12 @@ void hit(int stick, int dir) {
   //sprintf(buffer, "stick %d direction %d\n", stick, dir);
   //Serial.write(buffer);
   if (stick==1) {
-    //Serial.write("stick1 moving\n");
-    
     digitalWrite(IN1, dir);   
     digitalWrite(IN2, !dir);
-  } else if (stick==2) {
-    //Serial.write("stick2 moving\n"); 
-    
+  } else if (stick==2) {    
     digitalWrite(IN3, dir);
     digitalWrite(IN4, !dir);
-  }
-  else
-  {
+  } else {
     Serial.write("BAD INPUT\n");
   }
 }
