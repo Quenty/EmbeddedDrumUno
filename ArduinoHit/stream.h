@@ -9,4 +9,6 @@ public:
 	Queue();
 	bool push(int data);
 	int pop();
+	int length();
+	bool isFull();
 };

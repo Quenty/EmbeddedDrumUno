@@ -30,7 +30,9 @@ void loop() {
 bool readSerial(){
   if (Serial.available() > 0) {
     char inChar = Serial.read();
-    //add to buffer
+	int inNum = (int)inChar - 48;
+	
+	queue.push(inNum);
   }
   return false;
 }
