@@ -17,15 +17,15 @@ bool Queue::push(int data) {
 	}
 }
 
-int Queue::pop() {
+bool Queue::pop(int& result) {
 	if ((end + 1) % BUFFERSIZE == start) {  //catch end case
-		int result = buffer[end];
+		result = buffer[end];
 		end = (end + 1) % BUFFERSIZE;
-		return result;
+		return true;
 	}
 	else {
 		//error
-		return 0;
+		return false;
 	}
 }
 

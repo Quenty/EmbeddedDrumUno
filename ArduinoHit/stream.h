@@ -1,3 +1,6 @@
+#ifndef stream_h
+#define stream_h
+
 #define BUFFERSIZE 300
 
 class Queue {
@@ -8,7 +11,10 @@ private:
 public:
 	Queue();
 	bool push(int data);
-	int pop();
+	bool pop(int& result);
 	int length();
 	bool isFull();
 };
+
+
+#endif
