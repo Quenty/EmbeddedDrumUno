@@ -5,7 +5,8 @@
 
 #define IN3 8
 #define IN4 9
-
+ 
+Queue queue;
 
 void setup() {
   pinMode(IN1, OUTPUT);
@@ -23,40 +24,16 @@ void setup() {
 }
 
 void loop() { 
-  //Serial.write("GO\n");
-  // check for incoming serial data:
-  if (Serial.available() > 0) {
-    // read incoming serial data:
-    char inChar = Serial.read();
-    int inNum = (int)(inChar) - 49;
-
-    if (inNum >= 0 && inNum < 4){
-        //convert char to int (minus 1 for 0 array index)
-        go(patterns[inNum], lengths[inNum]);
-    }
-  }
-} 
-
-void go(const int* pattern, const int len) {
-  if (len <= 0)
-  {
-    Serial.write("Bad length");
-  }
   
-  for (int i=0; i<len; i+=3) {
-    int stick = pgm_read_word_near(pattern + i);
-    int dir = pgm_read_word_near(pattern + (i + 1)); 
-    int pause = pgm_read_word_near(pattern + (i + 2)); 
-
-    //char buffer[100];
-    //sprintf(buffer, "stick %d direction %d pause %d \n", stick, dir, pause);
-    //Serial.write(buffer);
-    
-    Serial.write("call hit");
-    hit(stick, dir); 
-    delay(pause); 
-  } 
 } 
+
+bool readSerial(){
+  if (Serial.available() > 0) {
+    char inChar = Serial.read();
+    //add to buffer
+  }
+  return false;
+}
 
 void hit(int stick, int dir) { 
   //char buffer[100];
