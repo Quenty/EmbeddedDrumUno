@@ -1,6 +1,6 @@
 from mido import MidiFile
 
-mid = MidiFile('RhythmAndDrums.mid')
+mid = MidiFile('Midi/RhythmAndDrums.mid')
 commands = []
 for i, track in enumerate(mid.tracks):
     # print('Track {}: {}'.format(i, track.name))
