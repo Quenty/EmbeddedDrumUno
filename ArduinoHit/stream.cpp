@@ -5,9 +5,9 @@ Queue::Queue() {
 	tailIndex = 0;
 }
 
-bool Queue::push(int data) {
+bool Queue::push(uint8_t data) {
 	if ((headIndex + 1) % BUFFERSIZE != tailIndex) {  //catch end case
-		buffer[headIndex] = data;
+		buffer[headIndex * sizeof(uint8_t)] = data;
 		headIndex = (headIndex + 1) % BUFFERSIZE;
 		return true;
 	}
@@ -17,9 +17,9 @@ bool Queue::push(int data) {
 	}
 }
 
-bool Queue::pop(int& result) {
+bool Queue::pop(uint8_t& result) {
 	if ((tailIndex) % BUFFERSIZE != headIndex) {  //catch end case
-		result = buffer[tailIndex];
+		result = buffer[tailIndex * sizeof(uint8_t)];
 		tailIndex = (tailIndex + 1) % BUFFERSIZE;
 		return true;
 	}
@@ -34,6 +34,6 @@ int Queue::length() {
 }
 
 bool Queue::isFull() {
-	return length() != BUFFERSIZE;
+	return length() < BUFFERSIZE;
 }
 

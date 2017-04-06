@@ -1,5 +1,7 @@
-#ifndef stream_h
-#define stream_h
+#pragma once
+#include <stdint.h>
+//#ifndef stream_h
+//#define stream_h
 
 #define BUFFERSIZE 300
 
@@ -7,14 +9,14 @@ class Queue {
 private:
 	int headIndex;
 	int tailIndex;
-	int buffer[BUFFERSIZE];
+	uint8_t buffer[BUFFERSIZE];
 public:
 	Queue();
-	bool push(int data);
-	bool pop(int& result);
+	bool push(uint8_t data);
+	bool pop(uint8_t& result);
 	int length();
 	bool isFull();
 };
 
 
-#endif
+//#endif
