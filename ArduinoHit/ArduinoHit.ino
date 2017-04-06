@@ -1,5 +1,4 @@
 #include "stream.h"
-#include "main.cpp"
 
 #define IN1 6
 #define IN2 7
@@ -7,7 +6,7 @@
 #define IN3 8
 #define IN4 9
 
-Queue queue;
+Queue queue; 
 
 void setup() {
   pinMode(IN1, OUTPUT);
@@ -22,30 +21,49 @@ void setup() {
 
   // open the serial port:
   Serial.begin(9600);
+  Serial.write("Start\n");
+
+  for(int i = 0; i < 250; i++){
+      queue.push(i);
+  }
+  
+  
+    
+ 
+    char buffer[100];
+    while(queue.length() > 0){
+    int bufferResult = 0;
+    queue.pop(bufferResult);
+
+    sprintf(buffer, "buffer says %d.\n", bufferResult);
+    Serial.write(buffer);      
+  }
+  
 }
 
 void readSerial();
 
-void loop() {
-  readSerial();
-
-  char buffer[100];
-  for(int i = 0; i < 10 && queue.length() > 0; i++){
-	  int bufferResult =0;
-    queue.pop(bufferResult);
-
-	  sprintf(buffer, "buffer says %d.\n", bufferResult);
-	  Serial.write(buffer);
-  }
+void loop() {  
+//  readSerial();
+//
+//  char buffer[100];
+//  for(int i = 0; i < 10 && queue.length() > 0; i++){
+//	  int bufferResult =0;
+//    queue.pop(bufferResult);
+//
+//	  sprintf(buffer, "buffer says %d.\n", bufferResult);
+//	  Serial.write(buffer);
+//  }
 }
 
 void readSerial() {
-  while (Serial.available() > 0 && !queue.isFull()) {
-    char inChar = Serial.read();
-    int inNum = (int)inChar - 48;
-
-    queue.push(inNum);
-  }
+//  while (Serial.available() > 0 && !queue.isFull()) {
+//    char inChar = Serial.read();
+//    int inNum = (int) - 48;
+//
+//    Serial.write(inChar);
+//    queue.push(inNum);
+//  }
 }
 
 void hit(int stick, int dir) {

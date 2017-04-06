@@ -1,14 +1,14 @@
 #include "stream.h"
 
 Queue::Queue() {
-	start = 0;
-	end = 0;
+	headIndex = 0;
+	tailIndex = 0;
 }
 
 bool Queue::push(int data) {
-	if ((start + 1) % BUFFERSIZE == end) {  //catch end case
-		buffer[start] = data;
-		start = (start + 1) % BUFFERSIZE;
+	if ((headIndex + 1) % BUFFERSIZE != tailIndex) {  //catch end case
+		buffer[headIndex] = data;
+		headIndex = (headIndex + 1) % BUFFERSIZE;
 		return true;
 	}
 	else {
@@ -18,9 +18,9 @@ bool Queue::push(int data) {
 }
 
 bool Queue::pop(int& result) {
-	if ((end + 1) % BUFFERSIZE == start) {  //catch end case
-		result = buffer[end];
-		end = (end + 1) % BUFFERSIZE;
+	if ((tailIndex) % BUFFERSIZE != headIndex) {  //catch end case
+		result = buffer[tailIndex];
+		tailIndex = (tailIndex + 1) % BUFFERSIZE;
 		return true;
 	}
 	else {
@@ -30,7 +30,7 @@ bool Queue::pop(int& result) {
 }
 
 int Queue::length() {
-	return ((start - end) + BUFFERSIZE) % BUFFERSIZE;
+	return ((headIndex - tailIndex) + BUFFERSIZE) % BUFFERSIZE;
 }
 
 bool Queue::isFull() {
