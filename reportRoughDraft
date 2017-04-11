@@ -19,28 +19,27 @@
 	
 \begin{center} \textbf{Engineering Requirements} \end{center}
 \textbf{Hardware:} we will be using a pre-assembled drum kit that is composed of a single drum, two drum sticks,an H-bridge, an actuator, and the drum itself.\\\\
-\textbf{Software:} In order to achieve the goals of the project, we must be able to implement C with the serial library and the Arduino IDE to perform a drum sequence. We also use python to create a program which inputs a MIDI file and Outputs the drum pattern to be used.
 \begin{center} \textbf{Architecture} \end{center}
 The system uses three main components for its architecture
 	\begin{enumerate}
 		\item Communication\\ Within the system, a single	controller	regulates the beats output by the drum. In order to achieve this, the system must be able to accept an input and process it to obtain the correct output.
-		this	communication
+		
 		\item Musical Input Translator\\ The system must be able to accept music data and convert it to an input that the system can use. This is done through a conversion program and custom compiler.
 		\item Drumstick	Controller\\
 		The	drumstick	controller is	a component	that inputs commands	to	hit	and	retract	the	drumstick . The controller must use these commands to output signals to the correct drumstick motor.
 	\end{enumerate}
 \begin{center} \textbf{Design} \end{center}
 \begin{enumerate}
-	\item Communication\\The compiler translates the MIDI files and uses the output to	control	the	motors	to	operate	the	drumsticks	and	strike	the	
+	\item Communication\\The compiler translates drumLang files and uses the output to	control	the	motors	to	operate	the	drumsticks	and	strike	the	
 	drums.
-	\item Musical Input Translator\\ The system must accepts music data and converts it to an input that the system can use. This is done through a conversion program and compiler as mentioned before.
+	\item Musical Input Translator\\ The system accepts music data and converts it to an input that the system can use. This is done through a conversion program and compiler as mentioned before.
 	\item Drumstick	Controller\\
-	The	drumstick	controller is	a component	that inputs commands	to	hit	and	retract	the	drumstick . The controller must use these commands to output signals to the correct drumstick motor.
+	The	drumstick	controller is	a component	that inputs commands	to	hit	and	retract	the	drumstick. The controller must use these commands to output signals to the correct drumstick motor.
 \end{enumerate}
 \begin{center} \textbf{Bug List}\\\vspace{5mm} \end{center}
 \indent \textbf{March 28:}
 \begin{description}
-\item[$\bullet$] Python MIDI compiler syntax errors [fixed]\\
+\item[$\bullet$] Python drumLang compiler syntax errors [fixed]\\
 \end{description}
 
 \textbf{March 30:} 
@@ -94,3 +93,4 @@ All team members contributed in the development of the code, report, and debuggi
 	
 \begin{center} \textbf{Test results} \end{center}
 \end{document}          
+
