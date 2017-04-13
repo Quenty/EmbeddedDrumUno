@@ -6,7 +6,14 @@
 #define IN3 8
 #define IN4 9
 
+#define TIMER1MAXVALUE 65535
+
 Queue queue; 
+
+uint16_t nextStick;
+uint16_t nextDir;
+uint16_t nextHitTime;
+bool isNextHitValid;
 
 void setup() {
   pinMode(IN1, OUTPUT);
@@ -28,27 +35,40 @@ void setup() {
 void readSerial();
 
 void loop() {  
-  readSerial();
 
-  char buffer[100];
-  while(queue.length() > 0) {
-	  uint8_t bufferResult = 0;
-    queue.pop(bufferResult);
-
-	  sprintf(buffer, "buffer says %d.\n", bufferResult);
-	  Serial.write(buffer);
+  if(isNextHitValid){
+    if(TCNT1 > nextHitTime && TCNT1 - nextHitTime < TIMER1MAXVALUE / 2){
+    hit(nextStick, nextDir);
+    isNextHitValid = false;
+    readSerial();
+    setNextHit();
+    }
+  }else{
+    setNextHit();
   }
+  
 }
 
 void readSerial() {
   while (Serial.available() > 0) {  // && !queue.isFull()
     char inChar = Serial.read();
     //Serial.write(queue.length());
+    Serial.write("Read in ");
     Serial.write(inChar);
     Serial.write('\n');
-    int inNum = (int)inChar - 48;
+    uint16_t inNum = (uint16_t)inChar - 48;
 
     queue.push(inNum);
+  }
+}
+
+void setNextHit(){
+  if(queue.length() >=3){    
+    queue.pop(nextStick);
+    queue.pop(nextDir);
+    queue.pop(nextHitTime);
+
+    isNextHitValid = true;
   }
 }
 
