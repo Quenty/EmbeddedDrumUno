@@ -6,6 +6,7 @@
 #define IN3 8
 #define IN4 9
 
+#define PRESCALER 0b101
 #define TIMER1MAXVALUE 65535
 
 Queue queue; 
@@ -26,10 +27,17 @@ void setup() {
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
 
+  TCCR1A = 0; //set to normal counter mode
+  TCCR1B = PRESCALER && 0b111; //set prescaler and disable output compare
+  
+
   // open the serial port:
   Serial.begin(9600);
   Serial.write("Start\n");  
-  
+
+  TCNT1 = 0;  //reset timer after config done
+
+  //run sync initilization code here.
 }
 
 void readSerial();
