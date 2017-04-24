@@ -39,12 +39,33 @@ void setup() {
   TCNT1 = 0;  //reset timer after config done
 
   //run sync initilization code here.
+  
+  
+  
+   //Watchdog
+  //Disable all interrupts
+  cli();
+  //kick watchdog
+  wdt_reset();
+  //enable change on the watchdog
+  WDTCSR |= (1 << WDCE) | (1<<WDE);
+  //config the watchdog with timeout of 
+  WDTCSR = (0 <<WDIE) | (1<<WDE) | (0<<WDP3) | (1<<WDP2) | (1<<WDP1) | (0<<WDP0);
+  //enable all interrupts again
+  sei();
+  
+  
+  
 }
 
 void readSerial();
 
 void loop() {  
-
+  //Kick watchdog
+  wdt_reset();
+  
+  
+  
   if(isNextHitValid){
     if(TCNT1 > nextHitTime && TCNT1 - nextHitTime < TIMER1MAXVALUE / 2){
     hit(nextStick, nextDir);
