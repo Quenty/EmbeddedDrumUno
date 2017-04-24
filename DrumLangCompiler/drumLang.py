@@ -1,5 +1,5 @@
 inputFile = r"patterns/input.txt"
-outputFile = r"../ArduinoHit/patterns.h"
+outputFile = r"../Master/patterns.h"
 
 stickHit = {1:65, 2:65}
 

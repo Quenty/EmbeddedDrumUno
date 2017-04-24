@@ -1,3 +1,6 @@
+#include patterns.h;
+
+
 enum Drums { Snare, Bass };
 
 
