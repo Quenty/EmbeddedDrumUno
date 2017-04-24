@@ -13,7 +13,7 @@
 
 enum Drums { Snare = 1, Bass = 2, Hihat = 3, Tom1 = 4, Tom2 = 5, FloorTom = 6, Crash = 7}; 
 
-#define CURRENTDRUM 1
+#define CURRENTDRUM 7
 
 #define PRESCALER 0b101
 #define TIMER1MAXVALUE 65535
@@ -22,7 +22,7 @@ Queue queue;
 
 uint16_t nextStick;
 uint16_t nextDir;
-uint16_t nextHitTime;
+uint16_t nextHitTime = 0;
 bool isNextHitValid;
 signed long masterTimeOffset = 0;
 
@@ -45,10 +45,6 @@ void setup() {
   Serial.write("Start\n");  
 
   TCNT1 = 0;  //reset timer after config done
-
-  //run sync initilization code here.
-  Wire.begin(CURRENTDRUM);
-  Wire.onReceive(onSlaveReceive);
   
    //Watchdog
   //Disable all interrupts
@@ -61,33 +57,35 @@ void setup() {
   WDTCSR = (0 <<WDIE) | (1<<WDE) | (0<<WDP3) | (1<<WDP2) | (1<<WDP1) | (0<<WDP0);
   //enable all interrupts again
   sei();
+
+  //run sync initilization code here.
+  Wire.begin(CURRENTDRUM);
+  Wire.onReceive(onSlaveReceive);
 }
 
-void readSerial();
+//void readSerial();
 
 void loop() {  
   //Kick watchdog
   wdt_reset();
-  
-  
-  
+
   if(isNextHitValid){
-    if(TCNT1 > nextHitTime && TCNT1 - nextHitTime < TIMER1MAXVALUE / 2){
+    if((signed long) getMasterTime() > ((signed long) nextHitTime)){
       //starting hit, disable interupts
-      cli();
+//      cli();
       hit(nextStick, nextDir);
       isNextHitValid = false;
-      readSerial();
-      setNextHit();
-      sei();
+//      readSerial();
+//      setNextHit();
+//      sei();
     }
-  }else{
-    setNextHit();
   }
+  
+  setNextHit();
 
-  char buffer[100];
-  sprintf(buffer, "Master time is %ld\n", (unsigned long) getMasterTime());
-  Serial.write(buffer);
+//  char buffer[100];
+//  sprintf(buffer, "Master time is %ld\n", (unsigned long) getMasterTime());
+//  Serial.write(buffer);
 }
 
 uint16_t readUInt16(int& success)
@@ -135,7 +133,7 @@ unsigned long readLong()
 }
 
 void onSlaveReceive(int howMany) {
-  Serial.write("Received transmission\n");
+//  Serial.write("Received transmission\n");
   
   char transmissionType = 0;
   if (1 < Wire.available())
@@ -161,7 +159,10 @@ void onSlaveReceive(int howMany) {
 
     if (success)
     {
-      Serial.write("Got new hit command");
+      queue.push(stick);
+      queue.push(direction);
+      queue.push(hitTime);
+      Serial.write("New hit!\n");
     }
     else
     {
@@ -178,19 +179,19 @@ signed long getMasterTime() {
   return ((signed long) millis()) + masterTimeOffset;
 }
 
-
-void readSerial() {
-  while (Serial.available() > 0) {  // && !queue.isFull()
-    char inChar = Serial.read();
-    //Serial.write(queue.length());
-    Serial.write("Read in ");
-    Serial.write(inChar);
-    Serial.write('\n');
-    uint16_t inNum = (uint16_t)inChar - 48;
-
-    queue.push(inNum);
-  }
-}
+//
+//void readSerial() {
+//  while (Serial.available() > 0) {  // && !queue.isFull()
+//    char inChar = Serial.read();
+//    //Serial.write(queue.length());
+//    Serial.write("Read in ");
+//    Serial.write(inChar);
+//    Serial.write('\n');
+//    uint16_t inNum = (uint16_t)inChar - 48;
+//
+//    queue.push(inNum);
+//  }
+//}
 
 void setNextHit(){
   if(queue.length() >=3){    
@@ -203,9 +204,10 @@ void setNextHit(){
 }
 
 void hit(int stick, int dir) {
-  //char buffer[100];
-  //sprintf(buffer, "stick %d direction %d\n", stick, dir);
-  //Serial.write(buffer);
+  char buffer[100];
+  sprintf(buffer, "stick %d direction %d\n", stick, dir);
+  Serial.write(buffer);
+  
   if (stick == 1) {
     //Serial.write("stick1 moving\n");
 
