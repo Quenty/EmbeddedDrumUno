@@ -47,11 +47,9 @@ def makeHeader(inputFile, outputFile='../Master/patterns.h'):
                 if potential is not None:
                     if potential[2] < timestamp:
                         output.extend(potential)
-                        print(potential)
                         next_up_stack[i] = None
 
             output.extend((stick, 0, timestamp))
-            print((stick, 0, timestamp))
             if next_up_stack[stick-1] is not None:
                 raise Exception('stick already down, cannot make it go down again')
             next_up_stack[stick-1] = (stick, 1, timestamp+delays[drum][stick-1])
