@@ -1,0 +1,96 @@
+\documentclass[]{report}
+\usepackage{graphics}
+
+% Title Page
+\title{CSCE 236 Embedded Systems: Project 1}
+\author{Angelo Tenerelli, Ibraim Salinas, James Onnen, Dylan Gray, Lee Fitchett}
+
+
+\begin{document}
+\maketitle
+
+\begin{center} \textbf{Customer	Requirements} \end{center}
+	Play	a	basic	beat.
+\begin{enumerate}
+	\item  Each drum stick will be able to perform three different patterns that are at least 40 seconds in length.
+	\item Pass	requirement: The drum kit will be able to strike one of the drums in order to perform a basic beat.
+	\item A demo-video will also be required.
+\end{enumerate}
+	
+\begin{center} \textbf{Engineering Requirements} \end{center}
+\textbf{Hardware:} we will be using a pre-assembled drum kit that is composed of a single drum, two drum sticks,an H-bridge, an actuator, and the drum itself.\\\\
+\begin{center} \textbf{Architecture} \end{center}
+The system uses three main components for its architecture
+	\begin{enumerate}
+		\item Communication\\ Within the system, a single	controller	regulates the beats output by the drum. In order to achieve this, the system must be able to accept an input and process it to obtain the correct output.
+		
+		\item Musical Input Translator\\ The system must be able to accept music data and convert it to an input that the system can use. This is done through a conversion program and custom compiler.
+		\item Drumstick	Controller\\
+		The	drumstick	controller is	a component	that inputs commands	to	hit	and	retract	the	drumstick . The controller must use these commands to output signals to the correct drumstick motor.
+	\end{enumerate}
+\begin{center} \textbf{Design} \end{center}
+\begin{enumerate}
+	\item Communication\\The compiler translates drumLang files and uses the output to	control	the	motors	to	operate	the	drumsticks	and	strike	the	
+	drums.
+	\item Musical Input Translator\\ The system accepts music data and converts it to an input that the system can use. This is done through a conversion program and compiler as mentioned before.
+	\item Drumstick	Controller\\
+	The	drumstick	controller is	a component	that inputs commands	to	hit	and	retract	the	drumstick. The controller must use these commands to output signals to the correct drumstick motor.
+\end{enumerate}
+\begin{center} \textbf{Bug List}\\\vspace{5mm} \end{center}
+\indent \textbf{March 28:}
+\begin{description}
+\item[$\bullet$] Python drumLang compiler syntax errors [fixed]\\
+\end{description}
+
+\textbf{March 30:} 
+\begin{description}
+	\item[$\bullet$] Hit Program modified to pull from external file patterns
+	\item[$\bullet$] Compiler could not compile .h file [fixed]
+	\item[$\bullet$] Formatting fixed in patterns.h\\
+	\textbf{April 9:}
+	\item[$\bullet$] Latex file cannot compile[fixed]
+\end{description}
+	
+\begin{center} \textbf{ Schedule
+		and Staffing plan} \end{center}
+	The Project was done over several stages beginning March 28 and ending Tuesday April 11.\\
+	\textbf{Schedule}\\
+	\indent Started: March 28, 2017\\
+	\indent Bitbucket IDs: Thursday, March 29, 2017\\
+	\indent Checkpoint: Tuesday, April 4, 2017\\
+	\indent Video: Thursday, April 10 2017\\
+	\indent Written Report: Tuesday, April 11, 2017\\
+	\textbf{Overview:}\\
+	
+\textbf{March 28:}
+	\begin{description}
+		\item[$\bullet$] Arduino Hit program created
+		\item[$\bullet$] Added drum lang compiler
+		\item[$\bullet$] Add python git ignore\\
+	\end{description}
+	
+\textbf{March 30:} 
+	\begin{description}
+	\item[$\bullet$] Hit Program modified to pull from external file patterns
+	\item[$\bullet$] Compiler now compiles .h file that .ino file pulls in
+	\item[$\bullet$] Unused cpp file removed
+	\item[$\bullet$] Formatting fixed in patterns.h
+	\item[$\bullet$] Moved patterns to a folder
+	\item[$\bullet$] Added compiled patterns to git ignore	
+	\item[$\bullet$] python MidiReader created\\\\
+\textbf{April 3:}
+	\item[$\bullet$] .txt files updated
+	\item[$\bullet$] patterns stormed in progmem and put together
+	\item[$\bullet$] Moved MIDI Files\\\\
+\textbf{April 4:}
+	\item[$\bullet$] Checkpoint completed
+	\item[$\bullet$] Video created\\\\
+\textbf{April 9:}
+	\item[$\bullet$] Report rough draft completed
+	\end{description}
+\textbf{Staffing}\\
+All team members contributed in the development of the code, report, and debugging
+	
+\begin{center} \textbf{Test results} \end{center}
+\end{document}          
+
