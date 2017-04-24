@@ -6,6 +6,8 @@
 #define IN3 8
 #define IN4 9
 
+enum Drums { Snare, Bass };
+
 #define PRESCALER 0b101
 #define TIMER1MAXVALUE 65535
 
@@ -30,7 +32,6 @@ void setup() {
   TCCR1A = 0; //set to normal counter mode
   TCCR1B = PRESCALER && 0b111; //set prescaler and disable output compare
   
-
   // open the serial port:
   Serial.begin(9600);
   Serial.write("Start\n");  
