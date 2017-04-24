@@ -6,7 +6,7 @@
 #define IN3 8
 #define IN4 9
 
-enum Drums { Snare, Bass, Hihat, Tom1, Tom2, FloorTom };
+enum Drums { Snare, Bass, Hihat, Tom1, Tom2, FloorTom, Crash};
 
 #define PRESCALER 0b101
 #define TIMER1MAXVALUE 65535
