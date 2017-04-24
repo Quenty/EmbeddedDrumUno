@@ -1,7 +1,9 @@
 #include "stream.h"
 #include <Wire.h>
+#include <avr/wdt.h>
 
 #define TIME_HEADER 'T'
+
 
 #define IN1 6
 #define IN2 7
@@ -9,7 +11,8 @@
 #define IN3 8
 #define IN4 9
 
-enum Drums { Snare, Bass };
+enum Drums { Snare, Bass, Hihat, Tom1, Tom2, FloorTom, Crash}; 
+// Snare = 1, Bass = 2, Hihat = 3, Tom1 = 4, Tom2 = 5, FloorTom = 6, Crash = 7
 
 #define PRESCALER 0b101
 #define TIMER1MAXVALUE 65535
@@ -45,12 +48,28 @@ void setup() {
   //run sync initilization code here.
   Wire.begin(8);
   Wire.onReceive(onSlaveReceive);
+  
+   //Watchdog
+  //Disable all interrupts
+  cli();
+  //kick watchdog
+  wdt_reset();
+  //enable change on the watchdog
+  WDTCSR |= (1 << WDCE) | (1<<WDE);
+  //config the watchdog with timeout of 
+  WDTCSR = (0 <<WDIE) | (1<<WDE) | (0<<WDP3) | (1<<WDP2) | (1<<WDP1) | (0<<WDP0);
+  //enable all interrupts again
+  sei();
 }
 
 void readSerial();
 
 void loop() {  
-
+  //Kick watchdog
+  wdt_reset();
+  
+  
+  
   if(isNextHitValid){
     if(TCNT1 > nextHitTime && TCNT1 - nextHitTime < TIMER1MAXVALUE / 2){
     hit(nextStick, nextDir);
