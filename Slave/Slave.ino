@@ -1,4 +1,7 @@
 #include "stream.h"
+#include <Wire.h>
+
+#define TIME_HEADER 'T'
 
 #define IN1 6
 #define IN2 7
@@ -17,6 +20,7 @@ uint16_t nextStick;
 uint16_t nextDir;
 uint16_t nextHitTime;
 bool isNextHitValid;
+signed long masterTimeOffset = 0;
 
 void setup() {
   pinMode(IN1, OUTPUT);
@@ -39,6 +43,8 @@ void setup() {
   TCNT1 = 0;  //reset timer after config done
 
   //run sync initilization code here.
+  Wire.begin(8);
+  Wire.onReceive(onSlaveReceive);
 }
 
 void readSerial();
@@ -55,8 +61,66 @@ void loop() {
   }else{
     setNextHit();
   }
-  
+
+  char buffer[100];
+  sprintf(buffer, "Master time is %ld\n", (unsigned long) getMasterTime());
+  Serial.write(buffer);
 }
+
+unsigned long readLong()
+{
+  unsigned long value = 0;
+  unsigned int offset = 0;
+
+  while (Wire.available() > 0)
+  {
+    uint8_t readValue = Wire.read();
+//    char buffer[100];
+//    sprintf(buffer, "Read %u\n", readValue);
+//    Serial.write(buffer);
+    
+    value = value + (((unsigned long) readValue) << (offset*8));
+    offset += 1;
+  }
+
+  if (offset != 4)
+  {
+    char buffer[100];
+    sprintf(buffer, "Bad offset %u\n", offset);
+    Serial.write(buffer);
+  }
+
+  return value;
+}
+
+void onSlaveReceive(int howMany) {
+  Serial.write("Received transmission\n");
+  
+  char transmissionType = 0;
+  if (1 < Wire.available())
+  {
+    transmissionType = Wire.read();
+  }
+
+  if (transmissionType == TIME_HEADER)
+  {
+    unsigned long timeOne = readLong();
+    masterTimeOffset = ((signed long) timeOne) - ((signed long) millis());
+
+    char buffer[100];
+    sprintf(buffer, "Master time is %lu %ld\n", timeOne, getMasterTime());
+    Serial.write(buffer);
+  }
+  else
+  {
+    Serial.write("Bad transmission type\n");
+  }
+}
+
+signed long getMasterTime() {
+  return ((signed long) millis()) + masterTimeOffset;
+}
+
 
 void readSerial() {
   while (Serial.available() > 0) {  // && !queue.isFull()
