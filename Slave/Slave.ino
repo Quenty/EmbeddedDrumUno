@@ -3,7 +3,7 @@
 #include <avr/wdt.h>
 
 #define TIME_HEADER 'T'
-
+#define PATTERN_HEADER 'P'
 
 #define IN1 6
 #define IN2 7
@@ -86,6 +86,24 @@ void loop() {
   Serial.write(buffer);
 }
 
+uint16_t readUInt16(int& success)
+{
+  uint16_t value = 0;
+
+  if (Wire.available() < 2)
+  {
+    Serial.write("Bad length\n");
+    success = 0;
+    return 0;
+  }
+
+  uint8_t first = Wire.read();
+  uint8_t second = Wire.read();
+
+  value = ((uint16_t) first) + (((uint16_t) second) << 8);
+  return value;
+}
+
 unsigned long readLong()
 {
   unsigned long value = 0;
@@ -129,6 +147,22 @@ void onSlaveReceive(int howMany) {
     char buffer[100];
     sprintf(buffer, "Master time is %lu %ld\n", timeOne, getMasterTime());
     Serial.write(buffer);
+  }
+  else if (transmissionType == PATTERN_HEADER)
+  {
+    int success = 1;
+    uint16_t stick = readUInt16(success);
+    uint16_t direction = readUInt16(success);
+    uint16_t hitTime = readUInt16(success);
+
+    if (success)
+    {
+      Serial.write("Got new hit command");
+    }
+    else
+    {
+      Serial.write("Bad hit command format");
+    }
   }
   else
   {
