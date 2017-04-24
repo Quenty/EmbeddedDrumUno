@@ -1,5 +1,9 @@
 #include "stream.h"
+#include <Wire.h>
 #include <avr/wdt.h>
+
+#define TIME_HEADER 'T'
+#define PATTERN_HEADER 'P'
 
 #define IN1 6
 #define IN2 7
@@ -7,8 +11,9 @@
 #define IN3 8
 #define IN4 9
 
-enum Drums { Snare, Bass, Hihat, Tom1, Tom2, FloorTom, Crash}; 
-// Snare = 1, Bass = 2, Hihat = 3, Tom1 = 4, Tom2 = 5, FloorTom = 6, Crash = 7
+enum Drums { Snare = 1, Bass = 2, Hihat = 3, Tom1 = 4, Tom2 = 5, FloorTom = 6, Crash = 7}; 
+
+#define CURRENTDRUM 1
 
 #define PRESCALER 0b101
 #define TIMER1MAXVALUE 65535
@@ -19,6 +24,7 @@ uint16_t nextStick;
 uint16_t nextDir;
 uint16_t nextHitTime;
 bool isNextHitValid;
+signed long masterTimeOffset = 0;
 
 void setup() {
   pinMode(IN1, OUTPUT);
@@ -41,8 +47,8 @@ void setup() {
   TCNT1 = 0;  //reset timer after config done
 
   //run sync initilization code here.
-  
-  
+  Wire.begin(CURRENTDRUM);
+  Wire.onReceive(onSlaveReceive);
   
    //Watchdog
   //Disable all interrupts
@@ -55,9 +61,6 @@ void setup() {
   WDTCSR = (0 <<WDIE) | (1<<WDE) | (0<<WDP3) | (1<<WDP2) | (1<<WDP1) | (0<<WDP0);
   //enable all interrupts again
   sei();
-  
-  
-  
 }
 
 void readSerial();
@@ -70,16 +73,111 @@ void loop() {
   
   if(isNextHitValid){
     if(TCNT1 > nextHitTime && TCNT1 - nextHitTime < TIMER1MAXVALUE / 2){
-    hit(nextStick, nextDir);
-    isNextHitValid = false;
-    readSerial();
-    setNextHit();
+      //starting hit, disable interupts
+      cli();
+      hit(nextStick, nextDir);
+      isNextHitValid = false;
+      readSerial();
+      setNextHit();
+      sei();
     }
   }else{
     setNextHit();
   }
-  
+
+  char buffer[100];
+  sprintf(buffer, "Master time is %ld\n", (unsigned long) getMasterTime());
+  Serial.write(buffer);
 }
+
+uint16_t readUInt16(int& success)
+{
+  uint16_t value = 0;
+
+  if (Wire.available() < 2)
+  {
+    Serial.write("Bad length\n");
+    success = 0;
+    return 0;
+  }
+
+  uint8_t first = Wire.read();
+  uint8_t second = Wire.read();
+
+  value = ((uint16_t) first) + (((uint16_t) second) << 8);
+  return value;
+}
+
+unsigned long readLong()
+{
+  unsigned long value = 0;
+  unsigned int offset = 0;
+
+  while (Wire.available() > 0)
+  {
+    uint8_t readValue = Wire.read();
+//    char buffer[100];
+//    sprintf(buffer, "Read %u\n", readValue);
+//    Serial.write(buffer);
+    
+    value = value + (((unsigned long) readValue) << (offset*8));
+    offset += 1;
+  }
+
+  if (offset != 4)
+  {
+    char buffer[100];
+    sprintf(buffer, "Bad offset %u\n", offset);
+    Serial.write(buffer);
+  }
+
+  return value;
+}
+
+void onSlaveReceive(int howMany) {
+  Serial.write("Received transmission\n");
+  
+  char transmissionType = 0;
+  if (1 < Wire.available())
+  {
+    transmissionType = Wire.read();
+  }
+
+  if (transmissionType == TIME_HEADER)
+  {
+    unsigned long timeOne = readLong();
+    masterTimeOffset = ((signed long) timeOne) - ((signed long) millis());
+
+    char buffer[100];
+    sprintf(buffer, "Master time is %lu %ld\n", timeOne, getMasterTime());
+    Serial.write(buffer);
+  }
+  else if (transmissionType == PATTERN_HEADER)
+  {
+    int success = 1;
+    uint16_t stick = readUInt16(success);
+    uint16_t direction = readUInt16(success);
+    uint16_t hitTime = readUInt16(success);
+
+    if (success)
+    {
+      Serial.write("Got new hit command");
+    }
+    else
+    {
+      Serial.write("Bad hit command format");
+    }
+  }
+  else
+  {
+    Serial.write("Bad transmission type\n");
+  }
+}
+
+signed long getMasterTime() {
+  return ((signed long) millis()) + masterTimeOffset;
+}
+
 
 void readSerial() {
   while (Serial.available() > 0) {  // && !queue.isFull()
