@@ -11,8 +11,9 @@
 #define IN3 8
 #define IN4 9
 
-enum Drums { Snare, Bass, Hihat, Tom1, Tom2, FloorTom, Crash}; 
-// Snare = 1, Bass = 2, Hihat = 3, Tom1 = 4, Tom2 = 5, FloorTom = 6, Crash = 7
+enum Drums { Snare = 1, Bass = 2, Hihat = 3, Tom1 = 4, Tom2 = 5, FloorTom = 6, Crash = 7}; 
+
+#define CURRENTDRUM 1
 
 #define PRESCALER 0b101
 #define TIMER1MAXVALUE 65535
@@ -46,7 +47,7 @@ void setup() {
   TCNT1 = 0;  //reset timer after config done
 
   //run sync initilization code here.
-  Wire.begin(8);
+  Wire.begin(CURRENTDRUM);
   Wire.onReceive(onSlaveReceive);
   
    //Watchdog
@@ -72,10 +73,13 @@ void loop() {
   
   if(isNextHitValid){
     if(TCNT1 > nextHitTime && TCNT1 - nextHitTime < TIMER1MAXVALUE / 2){
-    hit(nextStick, nextDir);
-    isNextHitValid = false;
-    readSerial();
-    setNextHit();
+      //starting hit, disable interupts
+      cli();
+      hit(nextStick, nextDir);
+      isNextHitValid = false;
+      readSerial();
+      setNextHit();
+      sei();
     }
   }else{
     setNextHit();
