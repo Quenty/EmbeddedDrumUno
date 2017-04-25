@@ -1,4 +1,4 @@
-#include "patterns.h"
+// #include "patterns.h"
 #include <Wire.h>
 
 
@@ -13,6 +13,13 @@ void setup() {
   // put your setup code here, to run once:
   Wire.begin();
   Serial.begin(9600);
+  Serial.write("Master initialized\n");
+
+  for (int i=8; i<17; i++)
+  {
+  clearBuffer(i);
+//  clearBuffer(9);
+  }
 }
 
 void writeUInt16ToWire(uint16_t value)
@@ -23,7 +30,7 @@ void writeUInt16ToWire(uint16_t value)
 
 void writeLongToWire(unsigned long value)
 {
-//  char buffer[100];
+//  char buffer[50];
 //  sprintf(buffer, "Writing %lu\n", value);
 //  Serial.write(buffer);
 
@@ -37,7 +44,7 @@ void writeLongToWire(unsigned long value)
   }
 }
 
- oid writePattern(int wiredId, unsigned long data)
+void writePattern(int wireId, unsigned long data)
 {
   Wire.beginTransmission(wireId);
   Wire.write(PATTERN_HEADER);
@@ -78,19 +85,45 @@ void startSyncronization(int wireId)
   Serial.write(buffer);
 }
 
+void clearBuffer(int wireId)
+{
+  Serial.write("Clearing buffering\n");
+  Wire.beginTransmission(wireId);
+  Wire.write(CLEAR_QUEUE_HEADER);
+  Wire.endTransmission();
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
-  startSyncronization(8);
-  startSyncronization(7);
+  Serial.write("Sync start\n");
+  for (int i=8; i<17; i++) {
+  startSyncronization(i);
+//  startSyncronization(9);
+  }
+  Serial.write("Pattern write start\n");
 //  Serial.write("Done\n");
   
 //  writePattern(8, 1, LOW, millis() + 200);
-  writePattern(8, 1, HIGH, millis() + 400);
+//  writePattern(8, 1, HIGH, millis() + 400);
+
 
 //  writePattern(8, 2, LOW, millis() + 100);
 //  writePattern(8, 2, HIGH, millis() + 300);
 
   unsigned long now = millis();
+
+  // STICK, DIRECTION, TIME
+  // LOW is DOWN.
+  writePattern(8, (((unsigned long) 0b11) << 30) | (now + 400));
+  writePattern(8, (((unsigned long) 0b10) << 30) | (now + 500));
+  writePattern(8, (((unsigned long) 0b01) << 30) | (now + 1400));
+  writePattern(8, (((unsigned long) 0b00) << 30) | (now + 1600));
+
+  /*
+  writePattern(9, (((unsigned long) 0b11) << 30) | (now + 500));
+  writePattern(9, (((unsigned long) 0b10) << 30) | (now + 700));
+  writePattern(9, (((unsigned long) 0b01) << 30) | (now + 900));
+  writePattern(9, (((unsigned long) 0b00) << 30) | (now + 1100));*/
 //  writePattern(7, 2, HIGH, now + 400);
 //  writePattern(7, 1, HIGH, now + 600);
 //  writePattern(7, 2, LOW, now + 800);
@@ -99,5 +132,5 @@ void loop() {
   
   
   
-  delay(1000);
+  delay(2000);
 }
