@@ -23,21 +23,17 @@ def makeHeader(inputFile, outputFile='../Master/patterns.h'):
 
     for drumNum,pattern in enumerate(fin):
         drum = drums[drumNum]
+        print(drum)
 
         input = pattern.split(',')
         beats = list(map(lambda x:int(x),input))
 
         stick = 1
-        def switchStick():
-            global stick
-
-            if drum in ('cymbal','bass'):
-                stick = 1
-            else:
-                stick = 2 if stick == 1 else 1
-
 
         output = []
+        def extend_output(stick, direction, time):
+            output.append((stick-1)<<32 | direction<<31 | time)
+
         next_up_stack = [None, None]
 
         for timestamp in pattern.split(', '):
@@ -46,15 +42,19 @@ def makeHeader(inputFile, outputFile='../Master/patterns.h'):
             for i, potential in enumerate(next_up_stack):
                 if potential is not None:
                     if potential[2] < timestamp:
-                        output.extend(potential)
+                        extend_output(*potential)
                         next_up_stack[i] = None
 
-            output.extend((stick, 0, timestamp))
+            extend_output(stick, 0, timestamp)
             if next_up_stack[stick-1] is not None:
                 raise Exception('stick already down, cannot make it go down again')
             next_up_stack[stick-1] = (stick, 1, timestamp+delays[drum][stick-1])
 
-            switchStick()
+            
+            if drum in ('cymbal','bass'):
+                stick = 1
+            else:
+                stick = {1:2, 2:1}[stick]
 
         length = len(output)
         output = list(map(lambda x:str(x),output))
@@ -70,8 +70,8 @@ def makeHeader(inputFile, outputFile='../Master/patterns.h'):
     lenArr = list(map(lambda x:str(x),outputLengths))
     lenArr = ', '.join(lenArr)
     lenArr = '{' + lenArr + '}'
-    fout.writelines('const int lengths[numOfPatterns] PROGMEM = ' + lenArr + ';\n')
+    fout.writelines('const int lengths[numOfPatterns] = ' + lenArr + ';\n')
 
-    fout.writelines('const int patterns[numOfPatterns][maxLength] PROGMEM = {\n')
+    fout.writelines('const unsigned long patterns[numOfPatterns][maxLength] PROGMEM = {\n')
     fout.writelines(',\n'.join(outputs))
     fout.writelines('\n};\n')
