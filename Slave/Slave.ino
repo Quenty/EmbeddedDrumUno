@@ -87,9 +87,9 @@ void loop() {
   }
   
   char buffer[50];
-  sprintf(buffer, "Master time is %ld. Next hit time: %ld\n", (unsigned long) getMasterTime(), (unsigned long) nextHitTime);
+  sprintf(buffer, "Master time is %ld. Next hit time: %ld. Stick %d.\n", (unsigned long) getMasterTime(), (unsigned long) nextHitTime, nextStick);
   Serial.write(buffer);
-  delay(250);
+  delay(10);
 /*
   hit(1, LOW);
   hit(2, LOW);
@@ -206,6 +206,10 @@ void onSlaveReceive(int howMany) {
   else
   {
     Serial.write("Bad transmission type\n");
+    while(Serial.available() > 0)
+    {
+      Serial.read(); 
+    }
   }
 }
 
@@ -242,7 +246,7 @@ void setNextHit(){
 
 void hit(int stick, int dir) {
   char buffer[50];
-  sprintf(buffer, "stick %d direction %d\n", stick, dir);
+  sprintf(buffer, "[Hit] - stick %d direction %d %ul\n", stick, dir, (unsigned long) getMasterTime());
   Serial.write(buffer);
   
   if (stick == 1) {
@@ -259,6 +263,6 @@ void hit(int stick, int dir) {
   }
   else
   {
-    Serial.write("BAD INPUT\n");
+    Serial.write("[Hit] - BAD INPUT\n");
   }
 }

@@ -114,10 +114,10 @@ void loop() {
 
   // STICK, DIRECTION, TIME
   // LOW is DOWN.
-  writePattern(8, (((unsigned long) 0b11) << 30) | (now + 400));
-  writePattern(8, (((unsigned long) 0b10) << 30) | (now + 500));
-  writePattern(8, (((unsigned long) 0b01) << 30) | (now + 1400));
-  writePattern(8, (((unsigned long) 0b00) << 30) | (now + 1600));
+  writePattern(8, (((unsigned long) 0b00) << 30) | (now + 400));
+  writePattern(8, (((unsigned long) 0b01) << 30) | (now + 500));
+  writePattern(8, (((unsigned long) 0b10) << 30) | (now + 1400));
+  writePattern(8, (((unsigned long) 0b11) << 30) | (now + 1550));
 
   /*
   writePattern(9, (((unsigned long) 0b11) << 30) | (now + 500));
@@ -132,5 +132,5 @@ void loop() {
   
   
   
-  delay(2000);
+  delay(1000);
 }
