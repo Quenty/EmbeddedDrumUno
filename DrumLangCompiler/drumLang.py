@@ -32,7 +32,7 @@ def makeHeader(inputFile, outputFile='../Master/patterns.h'):
 
         output = []
         def extend_output(stick, direction, time):
-            output.append((stick-1)<<32 | direction<<31 | time)
+            output.append((stick-1)<<31 | direction<<30 | time)
 
         next_up_stack = [None, None]
 
