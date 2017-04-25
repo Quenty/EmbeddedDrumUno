@@ -32,12 +32,12 @@ def makeHeader(inputFile, outputFile='../Master/patterns.h'):
 
         output = []
         def extend_output(stick, direction, time):
-            output.append((stick-1)<<32 | direction<<31 | time)
+            output.append((stick-1)<<31 | direction<<30 | time)
 
         next_up_stack = [None, None]
 
         for timestamp in pattern.split(', '):
-            timestamp = int(timestamp)  # trim trailing comma
+            timestamp = int(timestamp)+2000  # trim trailing comma
 
             for i, potential in enumerate(next_up_stack):
                 if potential is not None:
