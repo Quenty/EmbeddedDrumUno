@@ -5,9 +5,9 @@ Queue::Queue() {
 	tailIndex = 0;
 }
 
-bool Queue::push(uint16_t data) {
+bool Queue::push(unsigned long data) {
 	if ((headIndex + 1) % BUFFERSIZE != tailIndex) {  //catch end case
-		buffer[headIndex * sizeof(uint16_t)] = data;
+		buffer[headIndex * sizeof(unsigned long)] = data;
 		headIndex = (headIndex + 1) % BUFFERSIZE;
 		return true;
 	}
@@ -17,9 +17,9 @@ bool Queue::push(uint16_t data) {
 	}
 }
 
-bool Queue::pop(uint16_t& result) {
+bool Queue::pop(unsigned long& result) {
 	if ((tailIndex) % BUFFERSIZE != headIndex) {  //catch end case
-		result = buffer[tailIndex * sizeof(uint16_t)];
+		result = buffer[tailIndex * sizeof(unsigned long)];
 		tailIndex = (tailIndex + 1) % BUFFERSIZE;
 		return true;
 	}

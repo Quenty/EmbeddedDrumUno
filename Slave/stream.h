@@ -9,11 +9,11 @@ class Queue {
 private:
 	int headIndex;
 	int tailIndex;
-	uint16_t buffer[BUFFERSIZE];
+	unsigned long  buffer[BUFFERSIZE];
 public:
 	Queue();
-	bool push(uint16_t data);
-	bool pop(uint16_t& result);
+	bool push(unsigned long data);
+	bool pop(unsigned long& result);
 	int length();
 	bool isFull();
 };

@@ -4,6 +4,8 @@
 
 #define TIME_HEADER 'T'
 #define PATTERN_HEADER 'P'
+#define CLEAR_QUEUE_HEADER 'C'
+
 
 #define IN1 6
 #define IN2 7
@@ -22,7 +24,7 @@ Queue queue;
 
 uint16_t nextStick;
 uint16_t nextDir;
-uint16_t nextHitTime = 0;
+unsigned long nextHitTime = 0;
 bool isNextHitValid;
 signed long masterTimeOffset = 0;
 
@@ -80,9 +82,11 @@ void loop() {
 //      sei();
     }
   }
-  
-  setNextHit();
 
+  if (!isNextHitValid) {
+    setNextHit();
+  }
+  
 //  char buffer[100];
 //  sprintf(buffer, "Master time is %ld\n", (unsigned long) getMasterTime());
 //  Serial.write(buffer);
@@ -150,6 +154,15 @@ void onSlaveReceive(int howMany) {
     sprintf(buffer, "Master time is %lu %ld\n", timeOne, getMasterTime());
     Serial.write(buffer);
   }
+  else if (transmissionType == CLEAR_QUEUE_HEADER)
+  {
+    Serial.write("Clearing queue\n");
+    while (queue.length() > 0) 
+    {
+      unsigned long dummy;
+      queue.pop(dummy);
+    }
+  }
   else if (transmissionType == PATTERN_HEADER)
   {
     int success = 1;
@@ -194,10 +207,16 @@ signed long getMasterTime() {
 //}
 
 void setNextHit(){
-  if(queue.length() >=3){    
-    queue.pop(nextStick);
-    queue.pop(nextDir);
-    queue.pop(nextHitTime);
+  if(queue.length() > 0){    
+    unsigned long data = 0;
+    queue.pop(data);
+    
+    nextHitTime = ((data << 2) >> 2);
+    nextStick = (int) ((data >> 31) & 0b1);
+    nextDir = (int) ((data >> 32) & 0b1);
+//    queue.pop(nextStick);
+//    queue.pop(nextDir);
+//    queue.pop(nextHitTime);
 
     isNextHitValid = true;
   }

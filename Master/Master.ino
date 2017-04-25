@@ -4,6 +4,7 @@
 
 #define TIME_HEADER 'T'
 #define PATTERN_HEADER 'P'
+#define CLEAR_QUEUE_HEADER 'C'
 
 enum Drums { Snare, Bass };
 
@@ -36,21 +37,28 @@ void writeLongToWire(unsigned long value)
   }
 }
 
-void writePattern(int wireId, uint16_t stick, uint16_t direction, uint16_t hitTime) 
+ oid writePattern(int wiredId, unsigned long data)
 {
-//  Serial.write("Starting pattern write\n");
-  
   Wire.beginTransmission(wireId);
   Wire.write(PATTERN_HEADER);
-  
-  writeUInt16ToWire(stick);
-  writeUInt16ToWire(direction);
-  writeUInt16ToWire(hitTime);
-  
+  writeLongToWire(data);
   Wire.endTransmission();
-
-//  Serial.write("Wrote pattern\n");
 }
+//void writePattern(int wireId, uint16_t stick, uint16_t direction, uint16_t hitTime) 
+//{
+////  Serial.write("Starting pattern write\n");
+//  
+//  Wire.beginTransmission(wireId);
+//  Wire.write(PATTERN_HEADER);
+//  
+//  writeUInt16ToWire(stick);
+//  writeUInt16ToWire(direction);
+//  writeUInt16ToWire(hitTime);
+//  
+//  Wire.endTransmission();
+//
+////  Serial.write("Wrote pattern\n");
+//}
 
 void startSyncronization(int wireId)
 {
@@ -76,17 +84,17 @@ void loop() {
   startSyncronization(7);
 //  Serial.write("Done\n");
   
-  writePattern(8, 1, LOW, millis() + 200);
+//  writePattern(8, 1, LOW, millis() + 200);
   writePattern(8, 1, HIGH, millis() + 400);
-//
+
 //  writePattern(8, 2, LOW, millis() + 100);
 //  writePattern(8, 2, HIGH, millis() + 300);
 
   unsigned long now = millis();
-  writePattern(7, 2, HIGH, now + 400);
-  writePattern(7, 1, HIGH, now + 600);
-  writePattern(7, 2, LOW, now + 800);
-  writePattern(7, 1, LOW, now + 1000);
+//  writePattern(7, 2, HIGH, now + 400);
+//  writePattern(7, 1, HIGH, now + 600);
+//  writePattern(7, 2, LOW, now + 800);
+//  writePattern(7, 1, LOW, now + 1000);
 
   
   
