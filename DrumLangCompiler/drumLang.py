@@ -37,7 +37,7 @@ def makeHeader(inputFile, outputFile='../Master/patterns.h'):
         next_up_stack = [None, None]
 
         for timestamp in pattern.split(', '):
-            timestamp = int(timestamp)  # trim trailing comma
+            timestamp = int(timestamp)+2000  # trim trailing comma
 
             for i, potential in enumerate(next_up_stack):
                 if potential is not None:
