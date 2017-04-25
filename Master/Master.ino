@@ -1,5 +1,6 @@
 #include "patterns.h"
 #include <Wire.h>
+#include <avr/pgmspace.h>
 
 
 #define TIME_HEADER 'T'
@@ -7,7 +8,7 @@
 
 enum Drums { Snare, Bass };
 
-
+unsigned long getNextFromPattern(int index, int pattern);
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
@@ -71,7 +72,6 @@ void startSyncronization(int wireId)
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   startSyncronization(8);
   startSyncronization(7);
 //  Serial.write("Done\n");
@@ -88,8 +88,28 @@ void loop() {
   writePattern(7, 2, LOW, now + 800);
   writePattern(7, 1, LOW, now + 1000);
 
-  
-  
+  Serial.println("getting next ");
+
+  char buffer[100] = "";
+  Serial.write(buffer);  
+  for(int x = 0; x < 3; x++){
+    unsigned long next = getNextFromPattern(1, x);
+    sprintf(buffer, "%lu, ", next);
+  }
+
+  Serial.println(buffer);
   
   delay(1000);
 }
+
+unsigned long getNextFromPattern(int pattern, int index){
+//  Serial.print(" ");
+//  Serial.print(index);
+//  Serial.print(" ");
+  const long unsigned int* patternAddress = patterns[pattern]; //pgm_read_byte_near((unsigned long)patterns + pattern);
+  long unsigned int test = patternAddress[index];
+
+  return test;
+}
+
+
