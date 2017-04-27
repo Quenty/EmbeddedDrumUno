@@ -1,119 +1,68 @@
 #include "patterns.h"
-#include <Wire.h>
 #include <avr/pgmspace.h>
 
+#define IN1 7
+#define IN2 8
 
-#define TIME_HEADER 'T'
-#define PATTERN_HEADER 'P'
-#define CLEAR_QUEUE_HEADER 'C'
+#define IN3 9
+#define IN4 10
 
-enum Drums { Snare, Bass };
+#define SNAREA 2
+#define SNAREB 3
+#define CYMBOL 4
+
+#define TOMA 6
+#define TOMB 7
 
 unsigned long getNextFromPattern(int index, int pattern);
 void setup() {
-  // put your setup code here, to run once:
-  Wire.begin();
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+
   Serial.begin(9600);
+  Serial.write("Initialized\n");
 }
 
-void writeUInt16ToWire(uint16_t value)
-{
-  Wire.write((uint8_t) value);
-  Wire.write((uint8_t) (value >> 8));
-}
+int x = 0;
 
-void writeLongToWire(unsigned long value)
-{
-//  char buffer[100];
-//  sprintf(buffer, "Writing %lu\n", value);
-//  Serial.write(buffer);
-
-  for (unsigned int i=0; i < 4; i++)
-  {
-    uint8_t int_value = (uint8_t) (value >> (i*8)); //(byte) (value >> (i*4));
-    Wire.write(int_value);
-//    char buffer[100];
-//    sprintf(buffer, "Wrote %u\n", int_value);
-//    Serial.write(buffer);
-  }
-}
-
- oid writePattern(int wiredId, unsigned long data)
-{
-  Wire.beginTransmission(wireId);
-  Wire.write(PATTERN_HEADER);
-  writeLongToWire(data);
-  Wire.endTransmission();
-}
-//void writePattern(int wireId, uint16_t stick, uint16_t direction, uint16_t hitTime) 
-//{
-////  Serial.write("Starting pattern write\n");
-//  
-//  Wire.beginTransmission(wireId);
-//  Wire.write(PATTERN_HEADER);
-//  
-//  writeUInt16ToWire(stick);
-//  writeUInt16ToWire(direction);
-//  writeUInt16ToWire(hitTime);
-//  
-//  Wire.endTransmission();
-//
-////  Serial.write("Wrote pattern\n");
-//}
-
-void startSyncronization(int wireId)
-{
-//  Serial.write("Syncronizing\n");
-  
-  Wire.beginTransmission(wireId);
-  Wire.write(TIME_HEADER);
-  
-  unsigned long timeOne = millis();
-  writeLongToWire(timeOne);
-//  Serial.write("Done writing long\n");
-  Wire.endTransmission();
-//  Serial.write("Transmission done\n");
-
-  char buffer[50];
-  sprintf(buffer, "Master time %lu\n", timeOne);  
-  Serial.write(buffer);
-}
 
 void loop() {
-  startSyncronization(8);
-  startSyncronization(7);
-//  Serial.write("Done\n");
+  Serial.write("Looping!");
   
-//  writePattern(8, 1, LOW, millis() + 200);
-  writePattern(8, 1, HIGH, millis() + 400);
+  uint32_t data = getNextFromPattern(1, x);
+  unsigned int data_time = ((unsigned int) (data << 2 )) >> 2;
 
-//  writePattern(8, 2, LOW, millis() + 100);
-//  writePattern(8, 2, HIGH, millis() + 300);
+  int nextStick = (int) ((data >> 31) & 0b1);
+  int nextDir = (int) ((data >> 30) & 0b1);
 
-  unsigned long now = millis();
-//  writePattern(7, 2, HIGH, now + 400);
-//  writePattern(7, 1, HIGH, now + 600);
-//  writePattern(7, 2, LOW, now + 800);
-//  writePattern(7, 1, LOW, now + 1000);
+  char buffer[100];
+  sprintf(buffer, "Yolo %lu\n", data);
+  Serial.write(buffer);
+  
+  delay(millis() - data_time);
 
-  Serial.println("getting next ");
-
-  char buffer[100] = "";
-  Serial.write(buffer);  
-  for(int x = 0; x < 3; x++){
-    unsigned long next = getNextFromPattern(1, x);
-    sprintf(buffer, "%lu, ", next);
+  if (nextStick == 0) {
+    digitalWrite(IN1, nextDir);
+    digitalWrite(IN2, !nextDir);
+  }
+  else if (nextStick == 1) {
+    digitalWrite(IN3, nextDir);
+    digitalWrite(IN4, !nextDir);
   }
 
-  Serial.println(buffer);
-  
-  delay(1000);
+  x++;
 }
 
+
+
 unsigned long getNextFromPattern(int pattern, int index){
-//  Serial.print(" ");
-//  Serial.print(index);
-//  Serial.print(" ");
   const long unsigned int* patternAddress = patterns[pattern]; //pgm_read_byte_near((unsigned long)patterns + pattern);
   long unsigned int test = patternAddress[index];
 
