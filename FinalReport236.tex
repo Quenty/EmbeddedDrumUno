@@ -1,0 +1,115 @@
+\documentclass[]{report}
+\usepackage{graphics}
+
+% Title Page
+\title{CSCE 236 Embedded Systems: Final Project}
+\author{Angelo Tenerelli, Ibraim Salinas, James Onnen, Dylan Gray, Lee Fitchett}
+
+
+\begin{document}
+\maketitle
+
+\begin{center} \textbf{Customer	Requirements} \end{center}
+	Using multiple components of the drum set, play a drum loop that is, at least, a minute in length
+\begin{enumerate}
+	\item  Each drum component will be able to contribute to a play a single pattern.
+	\item Pass	requirement: The drum kit will be able to play a pattern that is one minute in length.
+	\item A demo-video will also be required.
+\end{enumerate}
+	
+\begin{center} \textbf{Engineering Requirements} \end{center}
+\textbf{Hardware:} We will be using a pre-assembled drum kit that is composed of a two tom-toms, a bass drum, floor tom, hi-hat, and crash. Each of these components will have One or Two drum stick(s),  H-bridge(s), actuator(s), and the drum-kit component itself. The H-bridge allows us to apply voltage in different directions across a load (the actuators). This is necessary to raise and lower the drumstick onto each drum-kit component.\\\\
+\textbf{Software:} To achieve our customer requirements code was created using python and C/C++. A MIDI converter was created using python in order to input a MIDI file and output a header file containing the necessary patterns for each drum. The drum-kit controller uses C and the patterns header file to send the corresponding pattern to the drum-kit component it is associated with. Time synchronization and error recovery is crucial to complete the task of playing a pattern correctly; to accomplish this a Master/Slave was used to synchronize the timing of each controller and drum. To recover from errors a Watchdog Timer was used to reset each component if unresponsive.
+\begin{center} \textbf{Architecture} \end{center}
+The system uses three main components for its architecture
+	\begin{enumerate}
+		\item Communication\\ Within the system, a	controller is used for each component. One Arduino is used as the master controller and the rest are used as slaves.	These signals regulate the beats output by each component. In order to achieve this, the system must be able to accept an input and process it to obtain the correct output.
+		
+		\item Musical Input Translator\\ The system must be able to accept music data,m in the form of a MIDI and convert it to an input that the system can interpret. This is done through a conversion program and custom compiler.
+		\item Drumstick	Controller\\
+		The	drumstick controller is	a component	that inputs commands to	hit	and	retract	the	drumstick . The controller must use these commands to output signals to the correct drumstick motor and also move the drumstick in the correct direction.
+	\end{enumerate}
+\begin{center} \textbf{Design} \end{center}
+\begin{enumerate}
+	\item Communication\\The compiler interprets a MIDI file and outputs a file containing the patters for each individual drum. This is done through the use of a 2D-Array which contains both the number corresponding to the enumeration associated with each component and the delay in between hits. In order to maintain synchronization of components, the product implements Master/Slave signals to achieve communication between each micro-controller. A Watchdog Timer is also used as a safeguard against components who are out of sync/ not responding. If not kicked, the Timer will then reset the component and re-sync with the other micro-controllers. %translates drumLang files and uses the output to	control	the	motors	to	operate	the	drumsticks	and	strike	the	
+	drums.
+	\item Musical Input Translator\\ The system accepts musical data in the form of MIDI files and, as stated before, outputs a header file which utilizes a 2D-Array that contains the delay between hits along with the associated drum-kit component. The system can then use these patterns as an input to the drumstick controller. 
+	\item Drumstick	Controller\\
+	The	drumstick	controller is a core component of software which utilizes the patterns.h header file mentioned earlier, and sends commands to	hit	and	retract	the	drumstick. This is accomplished through the use of an H-bridge which allows voltage to be applied in either direction across a load. The controller must use these commands generated from the header file to output signals to the correct drumstick motor.
+\end{enumerate}
+\begin{center} \textbf{Bug List}\\\vspace{5mm} \end{center}
+\indent \textbf{April 15:}
+\begin{description}
+\item[$\bullet$] Flash memory not large enough for program [fixed]: program data moved to progmem\\
+\item[$\bullet$] Patterns not output to multiple drums [fixed]: patterns.h updated
+\end{description}
+
+\textbf{April 19:}
+\begin{description}
+	\item[$\bullet$] Non-responsive drums unable to re-synchronize [fixed]: Watchdog Timer added
+\end{description}
+\textbf{April 22:}
+\begin{description}
+	\item[$\bullet$] Issue when passing value from pointer in hit [fixed]: Variable dereferenced. 
+	\item[$\bullet$] Garbage values given from MIDI converter [fixed]: cleaned up code and layout, made more readable.
+\end{description}
+\textbf{April 24:} 
+\begin{description}
+	\item[$\bullet$] Common ground causes motors to "spazz out". [fixed]: changed wiring of drum-kit.
+	\item[$\bullet$] Non-Functioning H-bridges and motors [fixed]: H-bridge replaced, drums with broken actuators not used.
+	\item[$\bullet$] Floor-tom inconsistent functionality [fixed]: wires re-stripped for greater surface area, rewired to H-bridge.
+	\item[$\bullet$] Compiler could not compile .h file [fixed]: missing semi-colon added.
+	\item[$\bullet$] Latex file cannot compile[fixed]: library added
+\end{description}
+	
+\begin{center} \textbf{ Schedule
+		and Staffing plan} \end{center}
+	The Project was done over several stages beginning March 28 and ending Tuesday April 11.\\
+	\textbf{Schedule}\\
+	\indent Started: April 11, 2017\\
+	\indent Video: Monday, April 24, 2017\\
+	\indent Written Report: Sunday, April 30, 2017\\
+	\textbf{Overview:}\\
+	
+\textbf{April 13:}
+	\begin{description}
+		\item[$\bullet$] Timer configured
+		\item[$\bullet$] Slave set-up to work with Timer 1
+		\item[$\bullet$] Merged Master branch from Project 1
+		\item[$\bullet$] git ignore added for .idea
+	\end{description}
+	
+\textbf{April 15:} 
+	\begin{description}
+	\item[$\bullet$] Renamed hit to slave and added Master.
+	\item[$\bullet$] MIDI files to be used added
+	\item[$\bullet$] Patterns added to Master
+	\item[$\bullet$] Merged remote tracking branch\\\\
+\textbf{April 19:}
+	\item[$\bullet$] Slave updated, more drums added
+	\item[$\bullet$] Watchdog added to slave
+	\item[$\bullet$] Time Synchronization implemented
+	\item[$\bullet$] Disabled Interrupts during hit\\\\
+\textbf{April 22:}
+	\item[$\bullet$] MIDI pattern converter bugs fixed
+	\item[$\bullet$] uint changed to unsigned long
+	\item[$\bullet$] Master branch merged \\\\
+\textbf{April 24:}
+	\item[$\bullet$] Added delay on startup
+	\item[$\bullet$] increased tom delay
+	\item[$\bullet$] "dumbed down" Master/Slave
+	\item[$\bullet$] Watchdog updated
+	\item[$\bullet$] Video created\\\\
+\textbf{April 29:}
+	\item[$\bullet$] Report completed
+	\end{description}
+\textbf{Staffing}\\
+All team members contributed in the development of the code, report, and debugging
+	
+\begin{center} \textbf{Test results} \end{center}
+\begin{description}
+	\item[$\bullet$] When attempting to de-bug, wrong values appear when print statements are used. Because our code is stored in progmem which is also used by print statements, the previous values were overwritten. This made testing and de-gugging much more difficult.
+	\item[$\bullet$] Time Synchronization was tested by creating a circuit using LEDs. [successful]
+	\item[$\bullet$] Final testing was done using the entire kit itself. [successful]
+\end{description}
+\end{document}          
