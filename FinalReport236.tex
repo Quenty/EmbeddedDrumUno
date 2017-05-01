@@ -1,46 +1,64 @@
-\documentclass[]{report}
+\documentclass[]{article}
 \usepackage{graphics}
 
 % Title Page
 \title{CSCE 236 Embedded Systems: Final Project}
 \author{Angelo Tenerelli, Ibraim Salinas, James Onnen, Dylan Gray, Lee Fitchett}
-
+\pagenumbering{gobble}
 
 \begin{document}
 \maketitle
+\newpage
 
-\begin{center} \textbf{Customer	Requirements} \end{center}
-	Using multiple components of the drum set, play a drum loop that is, at least, a minute in length
+\tableofcontents
+\pagenumbering{roman} 
+
+\newpage
+\setcounter{page}{1}
+\pagenumbering{arabic} 
+
+
+\section{Customer Requirements}
+	Using multiple components of the drum set, play a drum loop that is at least a minute in length
 \begin{enumerate}
 	\item  Each drum component will be able to contribute to a play a single pattern.
 	\item Pass	requirement: The drum kit will be able to play a pattern that is one minute in length.
 	\item A demo-video will also be required.
 \end{enumerate}
 	
-\begin{center} \textbf{Engineering Requirements} \end{center}
-\textbf{Hardware:} We will be using a pre-assembled drum kit that is composed of a two tom-toms, a bass drum, floor tom, hi-hat, and crash. Each of these components will have One or Two drum stick(s),  H-bridge(s), actuator(s), and the drum-kit component itself. The H-bridge allows us to apply voltage in different directions across a load (the actuators). This is necessary to raise and lower the drumstick onto each drum-kit component.\\\\
-\textbf{Software:} To achieve our customer requirements code was created using python and C/C++. A MIDI converter was created using python in order to input a MIDI file and output a header file containing the necessary patterns for each drum. The drum-kit controller uses C and the patterns header file to send the corresponding pattern to the drum-kit component it is associated with. Time synchronization and error recovery is crucial to complete the task of playing a pattern correctly; to accomplish this a Master/Slave was used to synchronize the timing of each controller and drum. To recover from errors a Watchdog Timer was used to reset each component if unresponsive.
-\begin{center} \textbf{Architecture} \end{center}
-The system uses three main components for its architecture
+\section{Engineering Requirements}
+\noindent \textbf{Hardware:} We will be using a pre-assembled drum kit that is composed of two tom-toms, a bass drum, floor tom, hi-hat, and crash cymbal. Of these components, one of the tom-toms, the bass drum, the floor tom, and the crash cymbal were working. Each of these components will have either one or two drum sticks with actuators, one H-bridge, and the drum-kit component itself. The H-bridge allows us to manipulate the voltage across the actuators. This is necessary to raise and lower the drumstick onto each drum-kit component.\\[1em]
+
+\noindent\textbf{Software:} To achieve our customer requirements, code was created using Python and Arduino C/C++. We created a Python based MIDI converter which converts a MIDI file into a header file containing the drum patterns in our own binary format. This was later modified to output program instructions directly. The drum-kit master controller sends the patterns from the MIDI converter output to the corresponding drum-kit controllers. Time synchronization and error recovery is crucial to complete the task of playing a pattern correctly; to accomplish this a Master/Slave pattern was used to synchronize the timing of each controller. To recover from errors a watchdog was used to reset unresponsive slaves.
+
+
+\section{Architecture}
+The project has three main components.
+
 	\begin{enumerate}
-		\item Communication\\ Within the system, a	controller is used for each component. One Arduino is used as the master controller and the rest are used as slaves.	These signals regulate the beats output by each component. In order to achieve this, the system must be able to accept an input and process it to obtain the correct output.
+		\item Communication\\ Within the project, one Arduino is the master controller and the rest of the Arduinos are slaves. These Arduinos communicate through wires using the Wire library. These wires communicate commands that synchronize time, and communicate beat times. 
 		
-		\item Musical Input Translator\\ The system must be able to accept music data,m in the form of a MIDI and convert it to an input that the system can interpret. This is done through a conversion program and custom compiler.
+		\item Musical Input Translator\\ The Python music input translator accepts music data in the form of a MIDI file and converts it to an input that the system can interpret. This used a MIDI library to read in the data, and then an algorithm to select the correctly alternate stick hits in modules with 2 sticks to account for rapid beats. 
+		
 		\item Drumstick	Controller\\
-		The	drumstick controller is	a component	that inputs commands to	hit	and	retract	the	drumstick . The controller must use these commands to output signals to the correct drumstick motor and also move the drumstick in the correct direction.
+		The	drumstick controller is	a component	that accepts commands to	hit	and	retract	the	drumstick. The controller must use these commands to output signals to the correct drumstick motor and also move the drumstick in the correct direction. These acted as an embedded slave of part of a bigger system. 
 	\end{enumerate}
-\begin{center} \textbf{Design} \end{center}
+	
+	
+\section{Design}
 \begin{enumerate}
-	\item Communication\\The compiler interprets a MIDI file and outputs a file containing the patters for each individual drum. This is done through the use of a 2D-Array which contains both the number corresponding to the enumeration associated with each component and the delay in between hits. In order to maintain synchronization of components, the product implements Master/Slave signals to achieve communication between each micro-controller. A Watchdog Timer is also used as a safeguard against components who are out of sync/ not responding. If not kicked, the Timer will then reset the component and re-sync with the other micro-controllers. %translates drumLang files and uses the output to	control	the	motors	to	operate	the	drumsticks	and	strike	the	
-	drums.
-	\item Musical Input Translator\\ The system accepts musical data in the form of MIDI files and, as stated before, outputs a header file which utilizes a 2D-Array that contains the delay between hits along with the associated drum-kit component. The system can then use these patterns as an input to the drumstick controller. 
+	\item Communication\\The compiler interprets a MIDI file and outputs a file containing the patterns for each individual drum. This is done through the use of a 2D-array which contains both the number corresponding to the enumerated components, the stick direction, and the time delay in a 32 bit integer. In order to maintain synchronization of components, the product implements Master/Slave signals to achieve communication between each micro-controller. A watchdog is also used as a safeguard against components who are out of sync/ not responding. If not kicked, the Timer will then reset the component and re-sync with the other micro-controllers. 
+	
+	\item Musical Input Translator\\ The system accepts musical data in the form of MIDI files and, as stated before, outputs a header file which contains a 2D-Array that contains associated drum-kit patterns. The system can then send these patterns to the drumstick controller.
+	
 	\item Drumstick	Controller\\
-	The	drumstick	controller is a core component of software which utilizes the patterns.h header file mentioned earlier, and sends commands to	hit	and	retract	the	drumstick. This is accomplished through the use of an H-bridge which allows voltage to be applied in either direction across a load. The controller must use these commands generated from the header file to output signals to the correct drumstick motor.
+	The master drumstick controller is a core component of software which utilizes the patterns header file mentioned earlier, and sends commands to hit and retract the drumstick. This is accomplished through the use of an H-bridge which allows voltage to be applied in either direction across a load. The controller must use these commands generated from the header file to output signals to the correct drumstick motor.
 \end{enumerate}
-\begin{center} \textbf{Bug List}\\\vspace{5mm} \end{center}
+
+\section{Bug List}
 \indent \textbf{April 15:}
 \begin{description}
-\item[$\bullet$] Flash memory not large enough for program [fixed]: program data moved to progmem\\
+\item[$\bullet$] Flash memory not large enough for program [fixed]: program data moved to \texttt{PROGMEM}\\
 \item[$\bullet$] Patterns not output to multiple drums [fixed]: patterns.h updated
 \end{description}
 
@@ -62,13 +80,14 @@ The system uses three main components for its architecture
 	\item[$\bullet$] Latex file cannot compile[fixed]: library added
 \end{description}
 	
-\begin{center} \textbf{ Schedule
-		and Staffing plan} \end{center}
-	The Project was done over several stages beginning March 28 and ending Tuesday April 11.\\
+\section{Schedule and Staffing plan}
+	The Project was done over several stages beginning March 28 and ending Tuesday April 30.\\
 	\textbf{Schedule}\\
 	\indent Started: April 11, 2017\\
-	\indent Video: Monday, April 24, 2017\\
-	\indent Written Report: Sunday, April 30, 2017\\
+	\indent Video 1: Tuesday, April 4, 2017\\
+	\indent Video 2: Monday, April 24, 2017\\
+	\indent Presentation: Thursday, April 27, 2017\\
+	\indent Written Report: Sunday, April 30, 2017\\[1em]
 	\textbf{Overview:}\\
 	
 \textbf{April 13:}
@@ -106,10 +125,28 @@ The system uses three main components for its architecture
 \textbf{Staffing}\\
 All team members contributed in the development of the code, report, and debugging
 	
-\begin{center} \textbf{Test results} \end{center}
+\section{Test results}
+Testing was done through a variety of integration tests. Individual components and subsystems were tested as parts before included in the whole project. 
+
 \begin{description}
 	\item[$\bullet$] When attempting to de-bug, wrong values appear when print statements are used. Because our code is stored in progmem which is also used by print statements, the previous values were overwritten. This made testing and de-gugging much more difficult.
 	\item[$\bullet$] Time Synchronization was tested by creating a circuit using LEDs. [successful]
 	\item[$\bullet$] Final testing was done using the entire kit itself. [successful]
+\end{description}
+
+\section{Extra Credit}
+\begin{description}
+		\item [Time Synchronization] (Successful)\\
+		A wire library was used to create common Tx and Rx buses that all slaves were wired to. Each slave had a variable offset that represented the difference between its system time and the master's system time, updated every second. The master sent hit commands up to 5 seconds early. The offset was applied to the time on these hits, then queued using a circular buffer on the slave. 
+		\item [Bluetooth Communication]	(Attempted)
+		An attempt was made to use Bluetooth modules to wirelessly synchronize all Arduinos. The reason the time synchronization is so complex is to account for the latency inherent in Bluetooth communication. Unfortunately, we were unable to get the Bluetooth modules used to respond correctly to test commands, and were forced to resort to a direct wiring between master and slave. 
+		\item [Watchdog] (Successful)
+		The watchdog was enabled on each slave to recover from errors. As shown in the secondary video during our presentation, our slaves re-synced correctly even re-set, allowing the song to continue even if a watchdog activated. 
+		\item [Midi Compiler] (Successful)
+		Our Midi compiler was a Python script, which converted an input MIDI file into a series of drum hits. The compiler has two main phases. First, it used the open source Mido library to choose a track from input file, and turn that track into a sequence of notes and times. Then, it transfers this sequence of notes and times into drum hits. The program includes a mapping of MIDI notes to drums; multiple notes are mapped to the same drum. Drums with two sticks are told to alternate hits. Each drum has a specified attack speed, and "lift stick" events are added when needed. The final result is a list of all "stick on" and "stick off" events, with a time delay between them.
+		
+		
+
+	
 \end{description}
 \end{document}          
